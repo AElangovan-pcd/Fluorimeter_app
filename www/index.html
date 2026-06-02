@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Fluorimeter Wavelength & Color Name Mobile Analyser using camera sensor.">
+    <title>Fluorimeter Wavelength Analyser</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- Background Decor -->
+    <div class="background-decor">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <main class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-logo">
+                <span class="logo-icon">λ</span>
+                <h1>Fluorimeter <span class="highlight">Scan</span></h1>
+            </div>
+            <p class="subtitle">Mobile Camera Wavelength Sensor</p>
+        </header>
+
+        <!-- Mobile Layout: Single Column Stack -->
+        <div class="dashboard-stack">
+            
+            <!-- Camera Viewfinder Card (Primary Sensor) -->
+            <div class="card camera-card">
+                <div class="card-header">
+                    <span class="card-icon">📷</span>
+                    <h2>Camera Sensor Viewfinder</h2>
+                </div>
+                <div class="card-body">
+                    <div class="viewfinder-wrapper">
+                        <!-- Viewfinder Video Feed -->
+                        <video id="camera-stream" autoplay playsinline muted></video>
+                        
+                        <!-- view finder overlay elements -->
+                        <div class="viewfinder-overlay">
+                            <!-- Reticle Target Box -->
+                            <div class="reticle-box">
+                                <div class="reticle-corner tl"></div>
+                                <div class="reticle-corner tr"></div>
+                                <div class="reticle-corner bl"></div>
+                                <div class="reticle-corner br"></div>
+                                <div class="reticle-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Viewfinder Controls -->
+                    <div class="sensor-control-row">
+                        <div class="toggle-wrapper">
+                            <span class="toggle-label">Sensor Scan</span>
+                            <label class="switch">
+                                <input type="checkbox" id="scan-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="button-group">
+                            <button id="calibrate-btn" class="action-btn" disabled>
+                                <span class="btn-icon">🎯</span>Calibrate
+                            </button>
+                            <button id="reset-calib-btn" class="action-btn" disabled>
+                                <span class="btn-icon">🔄</span>Reset
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="calibration-status" id="calib-status">
+                        Sensor Active (Tap Calibrate with White/Reference target)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Output Card -->
+            <div class="card result-card">
+                <div class="card-header">
+                    <span class="card-icon">📊</span>
+                    <h2>Spectral Analysis</h2>
+                </div>
+                <div class="card-body">
+                    <div class="analysis-summary-row">
+                        <!-- Live Color Badge -->
+                        <div class="color-preview-box" id="color-preview">
+                            <div class="color-glow" id="color-glow"></div>
+                        </div>
+                        <div class="readout-column">
+                            <div class="readout-group">
+                                <span class="readout-label">Wavelength</span>
+                                <div class="readout-value-wrapper">
+                                    <span class="readout-value" id="wavelength-display">--</span>
+                                    <span class="readout-unit" id="wavelength-unit">nm</span>
+                                </div>
+                            </div>
+                            <div class="readout-group">
+                                <span class="readout-label">Perceived Color Name</span>
+                                <span class="readout-subvalue" id="color-name-display">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chromaticity Coordinates -->
+                    <div class="parameters-grid">
+                        <div class="param-box">
+                            <span class="param-name">CIE x</span>
+                            <span class="param-value font-mono" id="cie-x">--</span>
+                        </div>
+                        <div class="param-box">
+                            <span class="param-name">CIE y</span>
+                            <span class="param-value font-mono" id="cie-y">--</span>
+                        </div>
+                        <div class="param-box">
+                            <span class="param-name">Tristimulus X</span>
+                            <span class="param-value font-mono" id="tristimulus-x">--</span>
+                        </div>
+                        <div class="param-box">
+                            <span class="param-name">Tristimulus Y</span>
+                            <span class="param-value font-mono" id="tristimulus-y">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Mixer / Sliders Card (Toggles for Override) -->
+            <div class="card sliders-card">
+                <div class="card-header">
+                    <span class="card-icon">⚡</span>
+                    <h2>Manual Override Mixer</h2>
+                </div>
+                <div class="card-body">
+                    <div class="slider-group">
+                        <div class="slider-label-row">
+                            <label for="red-slider"><span class="badge badge-red">R</span> Red</label>
+                            <div class="numeric-input-wrapper">
+                                <input type="number" id="red-num" min="0" max="255" value="0">
+                            </div>
+                        </div>
+                        <div class="slider-input-wrapper">
+                            <input type="range" id="red-slider" min="0" max="255" value="0" class="rgb-slider slider-r">
+                        </div>
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-label-row">
+                            <label for="green-slider"><span class="badge badge-green">G</span> Green</label>
+                            <div class="numeric-input-wrapper">
+                                <input type="number" id="green-num" min="0" max="255" value="128">
+                            </div>
+                        </div>
+                        <div class="slider-input-wrapper">
+                            <input type="range" id="green-slider" min="0" max="255" value="128" class="rgb-slider slider-g">
+                        </div>
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-label-row">
+                            <label for="blue-slider"><span class="badge badge-blue">B</span> Blue</label>
+                            <div class="numeric-input-wrapper">
+                                <input type="number" id="blue-num" min="0" max="255" value="255">
+                            </div>
+                        </div>
+                        <div class="slider-input-wrapper">
+                            <input type="range" id="blue-slider" min="0" max="255" value="255" class="rgb-slider slider-b">
+                        </div>
+                    </div>
+
+                    <div class="picker-row">
+                        <div class="picker-wrapper">
+                            <label for="color-picker" class="picker-label">Color Picker</label>
+                            <input type="color" id="color-picker" value="#0080ff">
+                        </div>
+                        <div class="hex-wrapper">
+                            <label for="hex-input">HEX Code</label>
+                            <input type="text" id="hex-input" value="#0080FF" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CIE 1931 Plot Card -->
+            <div class="card canvas-card">
+                <div class="card-header">
+                    <span class="card-icon">🎨</span>
+                    <h2>CIE 1931 Chromaticity Diagram</h2>
+                </div>
+                <div class="card-body canvas-body">
+                    <div class="canvas-container">
+                        <canvas id="cie-canvas" width="360" height="380"></canvas>
+                    </div>
+                    <div class="plot-legend">
+                        <div class="legend-item"><span class="legend-dot dot-locus"></span>Locus</div>
+                        <div class="legend-item"><span class="legend-dot dot-d65"></span>D65</div>
+                        <div class="legend-item"><span class="legend-dot dot-color"></span>Target</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Microscope & Presets Card -->
+            <div class="card presets-card">
+                <div class="card-header">
+                    <span class="card-icon">🔬</span>
+                    <h2>Fluorescence Presets</h2>
+                </div>
+                <div class="card-body">
+                    <div class="preset-section">
+                        <h3>Laser Excitation</h3>
+                        <div class="preset-grid">
+                            <button class="preset-btn" data-r="75" data-g="0" data-b="130"><span class="dot" style="background:#4b0082"></span>254 nm</button>
+                            <button class="preset-btn" data-r="100" data-g="0" data-b="200"><span class="dot" style="background:#6400c8"></span>365 nm</button>
+                            <button class="preset-btn" data-r="120" data-g="0" data-b="255"><span class="dot" style="background:#7a00ff"></span>405 nm</button>
+                            <button class="preset-btn" data-r="0" data-g="180" data-b="255"><span class="dot" style="background:#00b4ff"></span>488 nm</button>
+                            <button class="preset-btn" data-r="0" data-g="255" data-b="0"><span class="dot" style="background:#00ff00"></span>532 nm</button>
+                        </div>
+                    </div>
+                    <div class="preset-section">
+                        <h3>Fluorophores Peak</h3>
+                        <div class="preset-grid">
+                            <button class="preset-btn" data-r="0" data-g="100" data-b="255"><span class="dot" style="background:#0064ff"></span>DAPI</button>
+                            <button class="preset-btn" data-r="0" data-g="255" data-b="50"><span class="dot" style="background:#00ff32"></span>Fluorescein</button>
+                            <button class="preset-btn" data-r="0" data-g="255" data-b="100"><span class="dot" style="background:#00ff64"></span>GFP / FITC</button>
+                            <button class="preset-btn" data-r="255" data-g="110" data-b="0"><span class="dot" style="background:#ff6e00"></span>Methyl Orange</button>
+                            <button class="preset-btn" data-r="255" data-g="0" data-b="120"><span class="dot" style="background:#ff0078"></span>Rhodamine B</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights Card -->
+            <div class="card explanation-card">
+                <div class="card-header">
+                    <span class="card-icon">💡</span>
+                    <h2>Optical Insights</h2>
+                </div>
+                <div class="card-body">
+                    <div class="insight-content" id="insight-box">
+                        Activate sensor scan and align reticle over light source to analyze.
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Offscreen canvas used to grab central camera frame pixel colors -->
+    <canvas id="camera-buffer" width="10" height="10" style="display: none;"></canvas>
+
+    <!-- Application Script -->
+    <script src="index.js"></script>
+</body>
+</html>
